@@ -107,7 +107,7 @@ func applyWithKeyRecursively(jsonData map[string]interface{}, keys []string, f f
 		for _, value := range data {
 			switch v := value.(type) {
 			case map[string]interface{}:
-				if err := applyWithKeyRecursively(v, keys, f); err != nil {
+				if err := applyWithKeyRecursively(v, keys[1:], f); err != nil {
 					errMsg += err.Error()
 				}
 			default:
