@@ -2,8 +2,9 @@ module github.com/nikkely/ddl-translate
 
 go 1.18
 
-require github.com/itchyny/gojq v0.12.7
-
 require (
-	github.com/itchyny/timefmt-go v0.1.3 // indirect
+	github.com/google/go-cmp v0.5.7
+	gopkg.in/ini.v1 v1.66.4
 )
+
+require github.com/stretchr/testify v1.7.1 // indirect
