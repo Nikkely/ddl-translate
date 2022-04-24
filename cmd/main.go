@@ -32,13 +32,23 @@ func main() {
 	for i := 0; i < len(os.Args); i++ {
 		switch os.Args[1+i] {
 		case "json":
+			jsonPath := jsonCmd.String("path", "", "path to json")
 			jsonCmd.Parse(os.Args[2+i:])
-			j, err := ddl.NewJsonObj([]byte(jsonCmd.Arg(0)))
+
+			var j *ddl.JSONObj
+			pos := 0
+			if *jsonPath == "" {
+				j, err = ddl.NewJSONObj([]byte(jsonCmd.Arg(0)))
+				pos++
+			} else {
+				j, err = ddl.NewJSONObjFromFile(*jsonPath)
+			}
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err.Error())
 				os.Exit(1)
 			}
-			err = j.Translate(jsonCmd.Args()[1:], translate.NewDeepl(deeplCfg))
+
+			err = j.Translate(jsonCmd.Args()[pos:], translate.NewDeepl(deeplCfg))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err.Error())
 				os.Exit(1)

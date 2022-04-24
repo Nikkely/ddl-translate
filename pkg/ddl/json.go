@@ -9,19 +9,32 @@ import (
 	"github.com/nikkely/ddl-translate/pkg/translate"
 )
 
-type jsonObj struct {
+type JSONObj struct {
 	data map[string]interface{}
 }
 
-func NewJsonObj(data []byte) (*jsonObj, error) {
+func NewJSONObj(data []byte) (*JSONObj, error) {
 	var d map[string]interface{}
 	if err := json.Unmarshal(data, &d); err != nil {
 		return nil, err
 	}
-	return &jsonObj{data: d}, nil
+	return &JSONObj{data: d}, nil
 }
 
-func (j jsonObj) ToString() (string, error) {
+func NewJSONObjFromFile(path string) (*JSONObj, error) {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var d map[string]interface{}
+	if err = json.Unmarshal(raw, &d); err != nil {
+		return nil, err
+	}
+	return &JSONObj{data: d}, nil
+}
+
+func (j JSONObj) ToString() (string, error) {
 	data, err := json.Marshal(j.data)
 	if err != nil {
 		return "", err
@@ -32,7 +45,7 @@ func (j jsonObj) ToString() (string, error) {
 
 // Translate translate values detected by keys
 // keyQuery spec is ".xxx.yyy"
-func (j jsonObj) Translate(keys []string, translater translate.Translater) error {
+func (j JSONObj) Translate(keys []string, translater translate.Translater) error {
 	for _, key := range keys {
 		err := j.applyWithKey(key, translater)
 		if err != nil {
@@ -43,7 +56,7 @@ func (j jsonObj) Translate(keys []string, translater translate.Translater) error
 	return nil
 }
 
-func (j jsonObj) applyWithKey(keyQuery string, translater translate.Translater) error {
+func (j JSONObj) applyWithKey(keyQuery string, translater translate.Translater) error {
 	applier := func(value interface{}) interface{} {
 		switch v := value.(type) {
 		case string:

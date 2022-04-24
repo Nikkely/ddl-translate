@@ -36,6 +36,7 @@ type deeplRes struct {
 }
 
 func (d Deepl) Run(text string) (string, error) {
+	// TODO: run with multi thread
 	body := url.Values{}
 	body.Add("auth_key", d.apiKey)
 	body.Add("text", text)
