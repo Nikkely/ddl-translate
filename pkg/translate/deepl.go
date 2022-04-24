@@ -6,19 +6,22 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"gopkg.in/ini.v1"
 )
 
 type Deepl struct {
-	apiKey string
-	lang   string
+	apiKey   string
+	lang     string
+	waitTime int // milli second
 }
 
 func NewDeepl(sec *ini.Section) *Deepl {
 	return &Deepl{
-		apiKey: sec.Key("key").String(),
-		lang:   sec.Key("lang").String(),
+		apiKey:   sec.Key("key").String(),
+		lang:     sec.Key("lang").String(),
+		waitTime: 100, // TODO: to be configurable
 	}
 }
 
@@ -35,7 +38,14 @@ type deeplRes struct {
 	Translations []translations // `json:"translations"`
 }
 
+var lastRunTime = time.Now()
+
 func (d Deepl) Run(text string) (string, error) {
+	if lastRunTime.After(time.Now().Add(time.Duration(d.waitTime) * time.Millisecond)) {
+		time.Sleep(time.Duration(d.waitTime))
+	}
+	lastRunTime = time.Now()
+
 	// TODO: run with multi thread
 	body := url.Values{}
 	body.Add("auth_key", d.apiKey)
